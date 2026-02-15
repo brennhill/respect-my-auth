@@ -90,6 +90,7 @@ Respect My Auth is a B2B, multi-tenant authentication and identity platform desi
 - Tenant-specific branding tokens control hosted UI appearance.
 - Asset uploads stored in R2 with caching.
 - Enterprise plan can remove platform branding entirely.
+ - Default branding is TalkLabs unless white-labeled for a customer.
 
 ## 9. Compliance and Security
 - SOC2 controls: access control, change management, logging, incident response.

@@ -3,10 +3,11 @@
 A Cloudflare-first, multi-tenant B2B authentication platform for SaaS apps that need OIDC/OAuth2, SAML SSO, SCIM provisioning, MFA, and hosted branded login.
 
 ## Start Here
-1. [docs/getting-started.md](docs/getting-started.md)
-2. [docs/product-spec.md](docs/product-spec.md)
-3. [docs/tech-spec.md](docs/tech-spec.md)
-4. [docs/openapi.yaml](docs/openapi.yaml)
+1. [docs/index.md](docs/index.md)
+2. [docs/getting-started.md](docs/getting-started.md)
+3. [docs/product-spec.md](docs/product-spec.md)
+4. [docs/tech-spec.md](docs/tech-spec.md)
+5. [docs/openapi.yaml](docs/openapi.yaml)
 
 ## Repository Map
 - [docs/](docs/): product and technical specs, OpenAPI, compliance, and runbooks

@@ -46,12 +46,12 @@ See:
 
 ## Repository Structure
 - [docs/](./): product + tech specs, OpenAPI, compliance
-- src/: Cloudflare Workers routes (stubs)
-- web/: hosted UI (to be implemented)
+- [src/](../src/): Cloudflare Workers routes (stubs)
+- [web/](../web/): hosted UI (to be implemented)
 
 ## Next Steps
 - Implement branding endpoints (`/admin/branding`, `/branding/:tenant`)
-- Build hosted login UI under web/
+- Build hosted login UI under [web/](../web/)
 - Add D1 schema migrations
 
 ## Related Docs

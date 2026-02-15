@@ -42,3 +42,14 @@ The branding token set is intentionally small to avoid CSS injection risk.
 - Whitelist font families or host fonts internally.
 - Validate colors as hex.
 - Enforce max sizes on logo assets.
+
+## Default Branding (TalkLabs)
+- company_name: TalkLabs
+- primary_color: #0B1220
+- secondary_color: #1F2937
+- background_color: #F8FAFC
+- text_color: #0F172A
+- font_family: IBM Plex Sans
+- button_radius: 8
+- card_style: elevated
+- white_label: false

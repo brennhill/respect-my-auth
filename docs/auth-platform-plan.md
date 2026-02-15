@@ -268,3 +268,46 @@ create table tenant_branding (
 6. Security
 - Encrypt PII with tenant key
 - TLS everywhere
+
+## 4. Branding and White-Labeling (Hosted UI)
+
+### Goals
+- Per-tenant branding for hosted login/consent pages and transactional emails.
+- Optional white-labeling (no platform branding) for enterprise plans.
+- Asset uploads stored in R2 with optional external URL support (cached).
+
+### Data Model
+- tenant_branding table (see schema above)
+- R2 assets for logos and favicon
+
+### Branding Endpoints
+- GET /admin/branding
+- PUT /admin/branding
+- POST /admin/branding/logo
+- GET /branding/:tenant (public tokens for hosted UI)
+
+### Behavior
+- Admin UI updates branding config.
+- Hosted UI resolves branding by tenant or by host header.
+- White-label flag removes platform footer and co-branding.
+- Custom domains can be added later (Cloudflare custom hostnames + per-tenant TLS).
+
+## 5. Theme Tokens (Hosted UI)
+
+### Token Set
+- company_name
+- logo_url
+- logo_dark_url
+- favicon_url
+- primary_color
+- secondary_color
+- background_color
+- text_color
+- font_family
+- button_radius
+- card_style
+- white_label
+
+### Notes
+- Tokens are returned by /branding/:tenant and cached at the edge.
+- UI consumes tokens at render time to prevent brand leakage between tenants.

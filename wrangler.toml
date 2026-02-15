@@ -1,0 +1,19 @@
+name = "respect-my-auth"
+main = "src/worker.ts"
+compatibility_date = "2026-02-01"
+
+[vars]
+APP_ENV = "dev"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "respect-my-auth"
+database_id = "<replace-with-d1-id>"
+
+[[r2_buckets]]
+binding = "AUDIT_BUCKET"
+bucket_name = "respect-my-auth-audit"
+
+[[r2_buckets]]
+binding = "ASSETS_BUCKET"
+bucket_name = "respect-my-auth-assets"

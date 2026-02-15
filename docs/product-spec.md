@@ -96,6 +96,13 @@ Respect My Auth is a B2B, multi-tenant authentication and identity platform desi
 - GDPR controls: data minimization, right to access/erasure, EU residency support.
 - Strong encryption for PII and per-tenant key rotation.
 
+## 9.1 Compliance Evidence (Artifacts)
+- Access logs for admin actions
+- Change log for deployments/releases
+- Incident response runbooks and postmortems
+- Data retention and deletion records
+- Vendor DPAs and risk assessments
+
 ## 10. Success Metrics
 - Time-to-integrate for OIDC < 1 hour.
 - Successful SAML setup in < 1 day with enterprise IT.

@@ -1,0 +1,1428 @@
+openapi: 3.0.3
+info:
+  title: Auth Platform API
+  version: 0.1.1
+  description: >-
+    B2B multi-tenant authentication platform (Cloudflare-first) supporting OIDC/OAuth2,
+    SAML SSO, SCIM, admin APIs, audit logging, and tenant branding.
+servers:
+  - url: https://api.example.com
+    description: Production
+  - url: https://api.sandbox.example.com
+    description: Sandbox
+security:
+  - bearerAuth: []
+tags:
+  - name: OIDC
+  - name: Auth
+  - name: Sessions
+  - name: SAML
+  - name: SCIM
+  - name: Admin
+  - name: Actions
+  - name: Branding
+  - name: System
+paths:
+  /.well-known/openid-configuration:
+    get:
+      tags: [OIDC]
+      summary: OIDC discovery document
+      responses:
+        '200':
+          description: OIDC configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OIDCDiscovery'
+  /oauth/jwks:
+    get:
+      tags: [OIDC]
+      summary: JSON Web Key Set
+      responses:
+        '200':
+          description: JWKS
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JWKS'
+  /oauth/authorize:
+    get:
+      tags: [OIDC]
+      summary: Authorization endpoint
+      parameters:
+        - $ref: '#/components/parameters/ClientId'
+        - $ref: '#/components/parameters/RedirectUri'
+        - $ref: '#/components/parameters/ResponseType'
+        - $ref: '#/components/parameters/Scope'
+        - $ref: '#/components/parameters/State'
+        - $ref: '#/components/parameters/Nonce'
+      responses:
+        '302':
+          description: Redirect with authorization code
+  /oauth/token:
+    post:
+      tags: [OIDC]
+      summary: Token endpoint
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenRequest'
+      responses:
+        '200':
+          description: Token response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+  /oauth/userinfo:
+    get:
+      tags: [OIDC]
+      summary: Userinfo endpoint
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Userinfo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInfo'
+  /oauth/introspect:
+    post:
+      tags: [OIDC]
+      summary: Token introspection
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/IntrospectRequest'
+      responses:
+        '200':
+          description: Introspection response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntrospectResponse'
+  /oauth/revoke:
+    post:
+      tags: [OIDC]
+      summary: Token revocation
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RevokeRequest'
+      responses:
+        '200':
+          description: Revocation OK
+
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Email/password login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+  /auth/magic/start:
+    post:
+      tags: [Auth]
+      summary: Start magic link login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MagicStartRequest'
+      responses:
+        '200':
+          description: Magic link created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MagicStartResponse'
+  /auth/magic/verify:
+    post:
+      tags: [Auth]
+      summary: Verify magic link
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MagicVerifyRequest'
+      responses:
+        '200':
+          description: Magic link verified
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+  /auth/social/{provider}/start:
+    post:
+      tags: [Auth]
+      summary: Start social login
+      parameters:
+        - $ref: '#/components/parameters/Provider'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SocialStartRequest'
+      responses:
+        '200':
+          description: Social login start
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SocialStartResponse'
+  /auth/social/{provider}/callback:
+    post:
+      tags: [Auth]
+      summary: Social login callback
+      parameters:
+        - $ref: '#/components/parameters/Provider'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SocialCallbackRequest'
+      responses:
+        '200':
+          description: Social login success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+  /auth/mfa/setup:
+    post:
+      tags: [Auth]
+      summary: Setup MFA (TOTP)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MfaSetupRequest'
+      responses:
+        '200':
+          description: MFA setup
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MfaSetupResponse'
+  /auth/mfa/verify:
+    post:
+      tags: [Auth]
+      summary: Verify MFA
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MfaVerifyRequest'
+      responses:
+        '200':
+          description: MFA verified
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+
+  /sessions/refresh:
+    post:
+      tags: [Sessions]
+      summary: Refresh access token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshRequest'
+      responses:
+        '200':
+          description: New token issued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+  /sessions/logout:
+    post:
+      tags: [Sessions]
+      summary: Logout and revoke session
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogoutRequest'
+      responses:
+        '200':
+          description: Logout OK
+
+  /saml/metadata/{tenant}:
+    get:
+      tags: [SAML]
+      summary: SAML metadata
+      parameters:
+        - $ref: '#/components/parameters/Tenant'
+      responses:
+        '200':
+          description: SAML metadata XML
+          content:
+            application/xml:
+              schema:
+                type: string
+  /saml/acs/{tenant}:
+    post:
+      tags: [SAML]
+      summary: SAML ACS endpoint
+      parameters:
+        - $ref: '#/components/parameters/Tenant'
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SamlAcsRequest'
+      responses:
+        '302':
+          description: Redirect to app
+  /saml/login/{tenant}:
+    get:
+      tags: [SAML]
+      summary: Initiate SAML login
+      parameters:
+        - $ref: '#/components/parameters/Tenant'
+      responses:
+        '302':
+          description: Redirect to IdP
+
+  /scim/v2/Users:
+    get:
+      tags: [SCIM]
+      summary: List users
+      parameters:
+        - $ref: '#/components/parameters/ScimStartIndex'
+        - $ref: '#/components/parameters/ScimCount'
+        - $ref: '#/components/parameters/ScimFilter'
+      responses:
+        '200':
+          description: SCIM list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScimUserList'
+    post:
+      tags: [SCIM]
+      summary: Create user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScimUser'
+      responses:
+        '201':
+          description: SCIM user created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScimUser'
+  /scim/v2/Users/{id}:
+    patch:
+      tags: [SCIM]
+      summary: Update user
+      parameters:
+        - $ref: '#/components/parameters/ScimUserId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScimPatchRequest'
+      responses:
+        '200':
+          description: SCIM user updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScimUser'
+    delete:
+      tags: [SCIM]
+      summary: Delete user
+      parameters:
+        - $ref: '#/components/parameters/ScimUserId'
+      responses:
+        '204':
+          description: Deleted
+  /scim/v2/Groups:
+    get:
+      tags: [SCIM]
+      summary: List groups
+      responses:
+        '200':
+          description: SCIM groups list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScimGroupList'
+
+  /admin/tenants/{tenant}:
+    get:
+      tags: [Admin]
+      summary: Get tenant
+      parameters:
+        - $ref: '#/components/parameters/Tenant'
+      responses:
+        '200':
+          description: Tenant
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tenant'
+  /admin/apps:
+    post:
+      tags: [Admin]
+      summary: Create app
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppCreate'
+      responses:
+        '201':
+          description: App created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/App'
+    get:
+      tags: [Admin]
+      summary: List apps
+      responses:
+        '200':
+          description: Apps list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppList'
+  /admin/users:
+    post:
+      tags: [Admin]
+      summary: Create user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreate'
+      responses:
+        '201':
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+    get:
+      tags: [Admin]
+      summary: List users
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: Users list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserList'
+  /admin/saml:
+    post:
+      tags: [Admin]
+      summary: Create SAML connection
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SamlConnectionCreate'
+      responses:
+        '201':
+          description: SAML connection created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SamlConnection'
+  /admin/audit:
+    get:
+      tags: [Admin]
+      summary: List audit logs
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: Audit log list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditLogList'
+
+  /admin/branding:
+    get:
+      tags: [Branding]
+      summary: Get tenant branding
+      responses:
+        '200':
+          description: Branding config
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenantBranding'
+    put:
+      tags: [Branding]
+      summary: Update tenant branding
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TenantBrandingUpdate'
+      responses:
+        '200':
+          description: Updated branding config
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenantBranding'
+  /admin/branding/logo:
+    post:
+      tags: [Branding]
+      summary: Upload branding logo asset
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                variant:
+                  type: string
+                  enum: [logo, logo_dark, favicon]
+      responses:
+        '201':
+          description: Uploaded logo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrandingAsset'
+  /branding/{tenant}:
+    get:
+      tags: [Branding]
+      summary: Public branding tokens for hosted UI
+      parameters:
+        - $ref: '#/components/parameters/Tenant'
+      responses:
+        '200':
+          description: Branding tokens
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenantBrandingPublic'
+
+  /actions:
+    post:
+      tags: [Actions]
+      summary: Register action
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActionCreate'
+      responses:
+        '201':
+          description: Action created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Action'
+  /actions/test:
+    post:
+      tags: [Actions]
+      summary: Test action
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActionTest'
+      responses:
+        '200':
+          description: Action test result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActionTestResult'
+  /actions/run:
+    post:
+      tags: [Actions]
+      summary: Run action (internal)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActionRun'
+      responses:
+        '200':
+          description: Action run result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActionRunResult'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    ClientId:
+      name: client_id
+      in: query
+      required: true
+      schema:
+        type: string
+    RedirectUri:
+      name: redirect_uri
+      in: query
+      required: true
+      schema:
+        type: string
+        format: uri
+    ResponseType:
+      name: response_type
+      in: query
+      required: true
+      schema:
+        type: string
+        example: code
+    Scope:
+      name: scope
+      in: query
+      required: true
+      schema:
+        type: string
+        example: openid profile email
+    State:
+      name: state
+      in: query
+      required: false
+      schema:
+        type: string
+    Nonce:
+      name: nonce
+      in: query
+      required: false
+      schema:
+        type: string
+    Provider:
+      name: provider
+      in: path
+      required: true
+      schema:
+        type: string
+        enum: [google]
+    Tenant:
+      name: tenant
+      in: path
+      required: true
+      schema:
+        type: string
+    Page:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        default: 1
+    PageSize:
+      name: page_size
+      in: query
+      required: false
+      schema:
+        type: integer
+        default: 50
+    ScimStartIndex:
+      name: startIndex
+      in: query
+      required: false
+      schema:
+        type: integer
+        default: 1
+    ScimCount:
+      name: count
+      in: query
+      required: false
+      schema:
+        type: integer
+        default: 100
+    ScimFilter:
+      name: filter
+      in: query
+      required: false
+      schema:
+        type: string
+    ScimUserId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        error_description:
+          type: string
+
+    OIDCDiscovery:
+      type: object
+      properties:
+        issuer:
+          type: string
+          format: uri
+        authorization_endpoint:
+          type: string
+          format: uri
+        token_endpoint:
+          type: string
+          format: uri
+        userinfo_endpoint:
+          type: string
+          format: uri
+        jwks_uri:
+          type: string
+          format: uri
+        response_types_supported:
+          type: array
+          items:
+            type: string
+        subject_types_supported:
+          type: array
+          items:
+            type: string
+        id_token_signing_alg_values_supported:
+          type: array
+          items:
+            type: string
+        scopes_supported:
+          type: array
+          items:
+            type: string
+      required:
+        - issuer
+        - authorization_endpoint
+        - token_endpoint
+        - jwks_uri
+
+    JWKS:
+      type: object
+      properties:
+        keys:
+          type: array
+          items:
+            type: object
+
+    TokenRequest:
+      type: object
+      required: [grant_type, client_id]
+      properties:
+        grant_type:
+          type: string
+          enum: [authorization_code, refresh_token, client_credentials]
+        client_id:
+          type: string
+        client_secret:
+          type: string
+        code:
+          type: string
+        redirect_uri:
+          type: string
+          format: uri
+        refresh_token:
+          type: string
+        scope:
+          type: string
+
+    TokenResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+        id_token:
+          type: string
+        refresh_token:
+          type: string
+        token_type:
+          type: string
+          example: Bearer
+        expires_in:
+          type: integer
+      required:
+        - access_token
+        - token_type
+        - expires_in
+
+    UserInfo:
+      type: object
+      properties:
+        sub:
+          type: string
+        email:
+          type: string
+        email_verified:
+          type: boolean
+        name:
+          type: string
+        given_name:
+          type: string
+        family_name:
+          type: string
+
+    IntrospectRequest:
+      type: object
+      required: [token]
+      properties:
+        token:
+          type: string
+        token_type_hint:
+          type: string
+          enum: [access_token, refresh_token]
+
+    IntrospectResponse:
+      type: object
+      properties:
+        active:
+          type: boolean
+        scope:
+          type: string
+        client_id:
+          type: string
+        username:
+          type: string
+        token_type:
+          type: string
+        exp:
+          type: integer
+        iat:
+          type: integer
+        sub:
+          type: string
+        aud:
+          type: string
+        iss:
+          type: string
+
+    RevokeRequest:
+      type: object
+      required: [token]
+      properties:
+        token:
+          type: string
+        token_type_hint:
+          type: string
+          enum: [access_token, refresh_token]
+
+    LoginRequest:
+      type: object
+      required: [tenant_id, email, password]
+      properties:
+        tenant_id:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        ip:
+          type: string
+
+    LoginResponse:
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/User'
+        session:
+          $ref: '#/components/schemas/Session'
+        tokens:
+          $ref: '#/components/schemas/TokenResponse'
+
+    MagicStartRequest:
+      type: object
+      required: [tenant_id, email]
+      properties:
+        tenant_id:
+          type: string
+        email:
+          type: string
+        redirect_uri:
+          type: string
+          format: uri
+
+    MagicStartResponse:
+      type: object
+      properties:
+        magic_link_id:
+          type: string
+        expires_in:
+          type: integer
+
+    MagicVerifyRequest:
+      type: object
+      required: [magic_link_id, code]
+      properties:
+        magic_link_id:
+          type: string
+        code:
+          type: string
+
+    SocialStartRequest:
+      type: object
+      required: [tenant_id, redirect_uri]
+      properties:
+        tenant_id:
+          type: string
+        redirect_uri:
+          type: string
+          format: uri
+
+    SocialStartResponse:
+      type: object
+      properties:
+        authorization_url:
+          type: string
+          format: uri
+
+    SocialCallbackRequest:
+      type: object
+      required: [tenant_id, code, redirect_uri]
+      properties:
+        tenant_id:
+          type: string
+        code:
+          type: string
+        redirect_uri:
+          type: string
+          format: uri
+
+    MfaSetupRequest:
+      type: object
+      required: [tenant_id]
+      properties:
+        tenant_id:
+          type: string
+        label:
+          type: string
+          example: primary
+
+    MfaSetupResponse:
+      type: object
+      properties:
+        otpauth_url:
+          type: string
+        secret_qr_svg:
+          type: string
+
+    MfaVerifyRequest:
+      type: object
+      required: [tenant_id, code]
+      properties:
+        tenant_id:
+          type: string
+        code:
+          type: string
+
+    RefreshRequest:
+      type: object
+      required: [refresh_token]
+      properties:
+        refresh_token:
+          type: string
+
+    LogoutRequest:
+      type: object
+      required: [session_id]
+      properties:
+        session_id:
+          type: string
+
+    SamlAcsRequest:
+      type: object
+      required: [SAMLResponse]
+      properties:
+        SAMLResponse:
+          type: string
+        RelayState:
+          type: string
+
+    ScimUserList:
+      type: object
+      properties:
+        totalResults:
+          type: integer
+        Resources:
+          type: array
+          items:
+            $ref: '#/components/schemas/ScimUser'
+        startIndex:
+          type: integer
+        itemsPerPage:
+          type: integer
+
+    ScimUser:
+      type: object
+      properties:
+        id:
+          type: string
+        userName:
+          type: string
+        name:
+          type: object
+          properties:
+            givenName:
+              type: string
+            familyName:
+              type: string
+        emails:
+          type: array
+          items:
+            type: object
+            properties:
+              value:
+                type: string
+              primary:
+                type: boolean
+        active:
+          type: boolean
+
+    ScimPatchRequest:
+      type: object
+      properties:
+        Operations:
+          type: array
+          items:
+            type: object
+            properties:
+              op:
+                type: string
+              path:
+                type: string
+              value:
+                type: object
+
+    ScimGroupList:
+      type: object
+      properties:
+        totalResults:
+          type: integer
+        Resources:
+          type: array
+          items:
+            $ref: '#/components/schemas/ScimGroup'
+
+    ScimGroup:
+      type: object
+      properties:
+        id:
+          type: string
+        displayName:
+          type: string
+
+    Tenant:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        plan:
+          type: string
+        region:
+          type: string
+        data_plane:
+          type: string
+          enum: [shared, dedicated]
+        created_at:
+          type: string
+          format: date-time
+
+    AppCreate:
+      type: object
+      required: [tenant_id, name, redirect_uris]
+      properties:
+        tenant_id:
+          type: string
+        name:
+          type: string
+        redirect_uris:
+          type: array
+          items:
+            type: string
+            format: uri
+        grant_types:
+          type: array
+          items:
+            type: string
+
+    App:
+      allOf:
+        - $ref: '#/components/schemas/AppCreate'
+        - type: object
+          properties:
+            id:
+              type: string
+            client_id:
+              type: string
+            created_at:
+              type: string
+              format: date-time
+
+    AppList:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/App'
+
+    UserCreate:
+      type: object
+      required: [tenant_id, email]
+      properties:
+        tenant_id:
+          type: string
+        email:
+          type: string
+        name:
+          type: string
+        role:
+          type: string
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        tenant_id:
+          type: string
+        email:
+          type: string
+        name:
+          type: string
+        role:
+          type: string
+        status:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+
+    UserList:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+
+    Session:
+      type: object
+      properties:
+        id:
+          type: string
+        user_id:
+          type: string
+        tenant_id:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        expires_at:
+          type: string
+          format: date-time
+
+    SamlConnectionCreate:
+      type: object
+      required: [tenant_id, name, idp_entity_id, idp_sso_url, idp_x509_cert, sp_entity_id]
+      properties:
+        tenant_id:
+          type: string
+        name:
+          type: string
+        idp_entity_id:
+          type: string
+        idp_sso_url:
+          type: string
+          format: uri
+        idp_x509_cert:
+          type: string
+        sp_entity_id:
+          type: string
+
+    SamlConnection:
+      allOf:
+        - $ref: '#/components/schemas/SamlConnectionCreate'
+        - type: object
+          properties:
+            id:
+              type: string
+            created_at:
+              type: string
+              format: date-time
+
+    AuditLogList:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditLog'
+
+    AuditLog:
+      type: object
+      properties:
+        id:
+          type: string
+        tenant_id:
+          type: string
+        actor_user_id:
+          type: string
+        event_type:
+          type: string
+        ip:
+          type: string
+        user_agent:
+          type: string
+        metadata:
+          type: object
+        created_at:
+          type: string
+          format: date-time
+
+    ActionCreate:
+      type: object
+      required: [tenant_id, name, trigger, url]
+      properties:
+        tenant_id:
+          type: string
+        name:
+          type: string
+        trigger:
+          type: string
+          example: post_login
+        url:
+          type: string
+          format: uri
+        timeout_ms:
+          type: integer
+          default: 1500
+
+    Action:
+      allOf:
+        - $ref: '#/components/schemas/ActionCreate'
+        - type: object
+          properties:
+            id:
+              type: string
+            created_at:
+              type: string
+              format: date-time
+
+    ActionTest:
+      type: object
+      required: [tenant_id, action_id]
+      properties:
+        tenant_id:
+          type: string
+        action_id:
+          type: string
+        payload:
+          type: object
+
+    ActionTestResult:
+      type: object
+      properties:
+        status:
+          type: string
+        output:
+          type: object
+
+    ActionRun:
+      type: object
+      required: [tenant_id, action_id, payload]
+      properties:
+        tenant_id:
+          type: string
+        action_id:
+          type: string
+        payload:
+          type: object
+
+    ActionRunResult:
+      type: object
+      properties:
+        status:
+          type: string
+        output:
+          type: object
+
+    TenantBranding:
+      type: object
+      properties:
+        tenant_id:
+          type: string
+        company_name:
+          type: string
+        support_email:
+          type: string
+        logo_url:
+          type: string
+          format: uri
+        logo_dark_url:
+          type: string
+          format: uri
+        favicon_url:
+          type: string
+          format: uri
+        primary_color:
+          type: string
+          example: '#1E3A8A'
+        secondary_color:
+          type: string
+          example: '#0F172A'
+        background_color:
+          type: string
+          example: '#F8FAFC'
+        text_color:
+          type: string
+          example: '#0F172A'
+        font_family:
+          type: string
+          example: 'IBM Plex Sans'
+        button_radius:
+          type: integer
+          example: 8
+        card_style:
+          type: string
+          enum: [flat, elevated]
+        white_label:
+          type: boolean
+        updated_at:
+          type: string
+          format: date-time
+
+    TenantBrandingUpdate:
+      type: object
+      properties:
+        company_name:
+          type: string
+        support_email:
+          type: string
+        logo_url:
+          type: string
+          format: uri
+        logo_dark_url:
+          type: string
+          format: uri
+        favicon_url:
+          type: string
+          format: uri
+        primary_color:
+          type: string
+        secondary_color:
+          type: string
+        background_color:
+          type: string
+        text_color:
+          type: string
+        font_family:
+          type: string
+        button_radius:
+          type: integer
+        card_style:
+          type: string
+          enum: [flat, elevated]
+        white_label:
+          type: boolean
+
+    BrandingAsset:
+      type: object
+      properties:
+        asset_id:
+          type: string
+        url:
+          type: string
+          format: uri
+        variant:
+          type: string
+          enum: [logo, logo_dark, favicon]
+
+    TenantBrandingPublic:
+      type: object
+      properties:
+        company_name:
+          type: string
+        logo_url:
+          type: string
+          format: uri
+        logo_dark_url:
+          type: string
+          format: uri
+        favicon_url:
+          type: string
+          format: uri
+        primary_color:
+          type: string
+        secondary_color:
+          type: string
+        background_color:
+          type: string
+        text_color:
+          type: string
+        font_family:
+          type: string
+        button_radius:
+          type: integer
+        card_style:
+          type: string
+          enum: [flat, elevated]
+        white_label:
+          type: boolean

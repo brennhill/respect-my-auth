@@ -220,6 +220,20 @@ Mitigations:
 - Email provider (Postmark/SES)
 - SAML library for Workers
 
+## 8.1 Hosting Alternative: Fly.io
+If Cloudflare is not viable for a tenant or compliance need, a Fly.io deployment can provide a regional, container-based option.
+
+Scope:
+- Deploy API as a containerized service (OIDC/OAuth2, SAML, SCIM, Admin, Branding).
+- Replace D1 with Postgres (Fly Postgres).
+- Replace KV with Redis (Upstash or Fly Redis).
+- Store assets/audit logs in object storage (S3-compatible).
+
+Tradeoffs:
+- Higher operational cost than Workers.
+- Requires scaling policy and regional routing.
+- More control for data residency and custom networking.
+
 ## 9. Risks and Mitigations
 - SAML library compatibility: preselect and test in Workers early
 - D1 scale limitations: heavy read caching at edge

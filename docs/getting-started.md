@@ -18,6 +18,13 @@ The platform is Cloudflare-first and serverless:
 - R2 for audit logs and assets
 - Pages for hosted login/consent UI
 
+## Hosting Alternative (Fly.io)
+If Cloudflare is not viable, the platform can be hosted on Fly.io:
+- API runs as a containerized service.
+- Postgres replaces D1.
+- Redis replaces KV.
+- S3-compatible storage replaces R2.
+
 ## How It Works (Conceptual)
 - Tenants configure apps and auth methods in the admin UI.
 - Apps use OIDC/OAuth2 to authenticate users.

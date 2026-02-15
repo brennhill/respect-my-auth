@@ -237,3 +237,40 @@ Retention:
 - Audit logs (cold): 1-7 years in R2 by plan
 - Sessions: 30 days (refresh tokens)
 - Magic link codes: minutes (KV)
+
+## 11. Security Architecture Appendix
+
+### 11.1 Key Hierarchy
+- Root KMS key (platform) protects per-tenant data keys.
+- Per-tenant data key encrypts PII fields in D1.
+- Per-tenant JWT signing key (separate from data key).
+
+### 11.2 Encryption Flow (PII)
+```text
+Write PII -> generate DEK (tenant) -> encrypt PII -> store in D1
+DEK wrapped by KMS key -> store encrypted DEK metadata
+```
+
+### 11.3 JWT Signing and Rotation
+```text
+Active signing key (kid A) issues tokens
+Rotation -> introduce kid B, publish both in JWKS
+Overlap window (e.g., 7 days) -> retire kid A
+```
+
+### 11.4 Refresh Token Rotation
+```text
+Client uses refresh token -> new refresh token issued
+Old refresh token revoked -> audit log entry
+```
+
+### 11.5 SAML Assertion Validation
+- Verify XML signature with IdP cert
+- Enforce strict audience and recipient checks
+- Enforce clock skew window (e.g., 3-5 minutes)
+- Reject unsigned assertions
+
+### 11.6 Admin Access Controls
+- MFA required for admin roles
+- IP allowlists optional for enterprise tenants
+- All admin actions recorded in audit logs

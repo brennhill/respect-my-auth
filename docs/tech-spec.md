@@ -47,6 +47,19 @@ IdP -> /scim/v2/Users (create/update)
 -> Audit log
 ```
 
+### 4.4 Branding Resolution
+```text
+Request Host/Header -> Tenant lookup
+-> Branding tokens from D1/R2 -> Edge cache
+-> Hosted UI render
+```
+
+### 4.5 Tenant Isolation Routing
+```text
+API Request -> Tenant Registry -> Data Plane Selector
+-> Shared D1 (default) OR Dedicated D1 (enterprise)
+```
+
 ## 5. API Surface (Summary)
 OIDC/OAuth2:
 - GET /.well-known/openid-configuration

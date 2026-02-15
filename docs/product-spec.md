@@ -38,6 +38,30 @@ Respect My Auth is a B2B, multi-tenant authentication and identity platform desi
 - Optional: dedicated data plane per enterprise tenant
 - Per-tenant JWT signing keys and encryption keys
 
+## 6.1 Plans and Gating
+
+### Starter
+- OIDC/OAuth2
+- Email/password + magic link
+- Basic admin UI
+- Shared data plane
+- Limited audit log retention
+
+### Growth
+- Everything in Starter
+- Social login (Google)
+- MFA (TOTP)
+- Branding (hosted UI tokens)
+- Extended audit log retention
+
+### Enterprise
+- Everything in Growth
+- SAML SSO
+- SCIM v2 provisioning
+- Dedicated data plane option (D1 + R2 namespace)
+- White-label (remove platform branding)
+- Custom SLA and support
+
 ## 7. User Journeys
 
 ### 7.1 App Developer Integrates OIDC
@@ -96,4 +120,36 @@ Respect My Auth is a B2B, multi-tenant authentication and identity platform desi
 User -> App -> /oauth/authorize -> Hosted Login
       <- redirect with code <-
 App -> /oauth/token -> access/id tokens
+```
+
+## 13. SAML Flow Diagram
+
+```text
+------+        +----------------+        +-------------------+
+|User | -----> | /saml/login/:t | -----> | Tenant IdP        |
+------+        +----------------+        +-------------------+
+   ^                    |                          |
+   |                    v                          |
+   |             /saml/acs/:t <---------------------+
+   |                    |
+   |                    v
+   |            Token issuance
+   +----------------------------- redirect to app
+```
+
+## 14. SCIM Provisioning Diagram
+
+```text
+-------------------+       +---------------------+       +-----------------+
+| Enterprise IdP   | ----> | /scim/v2/Users       | ----> | D1 (Users/Mems) |
+| (SCIM Client)    | ----> | /scim/v2/Groups      | ----> | Audit Logs      |
+-------------------+       +---------------------+       +-----------------+
+```
+
+## 15. Branding Resolution Diagram
+
+```text
+Request Host/Header -> Tenant Lookup -> Branding Tokens -> Hosted UI Render
+        |                    |                 |
+        +---- cache key ------+----- edge cache+
 ```

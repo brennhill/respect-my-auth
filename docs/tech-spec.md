@@ -234,6 +234,21 @@ Tradeoffs:
 - Requires scaling policy and regional routing.
 - More control for data residency and custom networking.
 
+### Decision Matrix (Cloudflare vs Fly.io)
+```text
+Criteria                  | Cloudflare                      | Fly.io
+-------------------------|----------------------------------|-------------------------------
+Cost (idle)              | Lowest (serverless)              | Higher (always-on instances)
+Scale-up latency         | Instant                          | Seconds to minutes
+Global edge              | Native                           | Regional (deploy by region)
+Runtime flexibility      | JS/TS, limited libs              | Full container control
+SAML/XML libs            | Potential constraints            | Easier (full runtime)
+Stateful coordination    | Durable Objects                  | Redis/Postgres/queues
+Data residency control   | Good (regional routing)          | Strong (pin to region)
+Operational overhead     | Minimal                          | Moderate (deploy/scale ops)
+Best for                 | Default tenant workload          | Enterprise/custom constraints
+```
+
 ## 9. Risks and Mitigations
 - SAML library compatibility: preselect and test in Workers early
 - D1 scale limitations: heavy read caching at edge

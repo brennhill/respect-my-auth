@@ -150,7 +150,7 @@ SOC2:
 - Access control: RBAC + MFA for admins, logged access events
 - Change management: tagged releases and deployment approvals
 - Logging/monitoring: centralized audit logs and alerts
-- Incident response: runbooks, on-call, postmortems
+- Incident response: runbooks, on-call, postmortems (see [docs/compliance-readiness-checklist.md](compliance-readiness-checklist.md))
 
 GDPR:
 - Right to access: export API
@@ -303,3 +303,12 @@ Old refresh token revoked -> audit log entry
 - MFA required for admin roles
 - IP allowlists optional for enterprise tenants
 - All admin actions recorded in audit logs
+
+## Related Docs
+- [docs/getting-started.md](getting-started.md)
+- [docs/product-spec.md](product-spec.md)
+- [docs/openapi.yaml](openapi.yaml)
+- [docs/branding-tokens.md](branding-tokens.md)
+- [docs/key-management-runbook.md](key-management-runbook.md)
+- [docs/saml-interop-matrix.md](saml-interop-matrix.md)
+- [docs/compliance-readiness-checklist.md](compliance-readiness-checklist.md)

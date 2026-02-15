@@ -311,3 +311,10 @@ create table tenant_branding (
 ### Notes
 - Tokens are returned by /branding/:tenant and cached at the edge.
 - UI consumes tokens at render time to prevent brand leakage between tenants.
+
+## Related Docs
+- [docs/getting-started.md](getting-started.md)
+- [docs/product-spec.md](product-spec.md)
+- [docs/tech-spec.md](tech-spec.md)
+- [docs/openapi.yaml](openapi.yaml)
+- [docs/branding-tokens.md](branding-tokens.md)

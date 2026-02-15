@@ -4,10 +4,10 @@ Date: 2026-02-15
 
 ## Architecture Entry Point
 Start with these docs in order:
-1. docs/product-spec.md
-2. docs/tech-spec.md
-3. docs/openapi.yaml
-4. docs/branding-tokens.md
+1. [docs/product-spec.md](product-spec.md)
+2. [docs/tech-spec.md](tech-spec.md)
+3. [docs/openapi.yaml](openapi.yaml)
+4. [docs/branding-tokens.md](branding-tokens.md)
 
 ## High-Level Architecture
 The platform is Cloudflare-first and serverless:
@@ -41,15 +41,22 @@ If Cloudflare is not viable, the platform can be hosted on Fly.io:
 
 ## System Diagrams
 See:
-- docs/product-spec.md (system diagram, OIDC flow, SAML flow, SCIM flow)
-- docs/tech-spec.md (data flow and routing diagrams)
+- [docs/product-spec.md](product-spec.md) (system diagram, OIDC flow, SAML flow, SCIM flow)
+- [docs/tech-spec.md](tech-spec.md) (data flow and routing diagrams)
 
 ## Repository Structure
-- docs/: product + tech specs, OpenAPI, compliance
+- [docs/](./): product + tech specs, OpenAPI, compliance
 - src/: Cloudflare Workers routes (stubs)
 - web/: hosted UI (to be implemented)
 
 ## Next Steps
-- Implement branding endpoints (/admin/branding, /branding/:tenant)
+- Implement branding endpoints (`/admin/branding`, `/branding/:tenant`)
 - Build hosted login UI under web/
 - Add D1 schema migrations
+
+## Related Docs
+- [docs/product-spec.md](product-spec.md)
+- [docs/tech-spec.md](tech-spec.md)
+- [docs/openapi.yaml](openapi.yaml)
+- [docs/branding-tokens.md](branding-tokens.md)
+- [docs/compliance-readiness-checklist.md](compliance-readiness-checklist.md)

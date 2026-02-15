@@ -53,3 +53,9 @@ The branding token set is intentionally small to avoid CSS injection risk.
 - button_radius: 8
 - card_style: elevated
 - white_label: false
+
+## Related Docs
+- [docs/getting-started.md](getting-started.md)
+- [docs/product-spec.md](product-spec.md)
+- [docs/tech-spec.md](tech-spec.md)
+- [docs/openapi.yaml](openapi.yaml)

@@ -9,7 +9,7 @@ A Cloudflare-first, multi-tenant B2B authentication platform for SaaS apps that 
 4. [docs/openapi.yaml](docs/openapi.yaml)
 
 ## Repository Map
-- `docs/`: product and technical specs, OpenAPI, compliance, and runbooks
+- [docs/](docs/): product and technical specs, OpenAPI, compliance, and runbooks
 - `src/`: Cloudflare Workers route stubs (API skeleton)
 - `web/`: hosted login/consent UI (planned)
 - `wrangler.toml`: Workers config (placeholder D1/R2 IDs)
@@ -26,4 +26,4 @@ npm run deploy
 ```
 
 ## Status
-This repo is an early-stage scaffold. Endpoints are documented in `docs/openapi.yaml` and stubbed in `src/`.
+This repo is an early-stage scaffold. Endpoints are documented in [docs/openapi.yaml](docs/openapi.yaml) and stubbed in `src/`.

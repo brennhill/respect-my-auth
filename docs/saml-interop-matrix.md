@@ -36,3 +36,8 @@ Date: 2026-02-15
 - Strict signature validation for all IdPs
 - Clock skew window: 3-5 minutes
 - RelayState supported
+
+## Related Docs
+- [docs/getting-started.md](getting-started.md)
+- [docs/tech-spec.md](tech-spec.md)
+- [docs/openapi.yaml](openapi.yaml)
